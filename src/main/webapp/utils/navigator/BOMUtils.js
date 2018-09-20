@@ -4,7 +4,7 @@
 var BOMUtils = {};
 
 /**
- * 获取请求连接中的参数
+ * 获取请求URL中的参数
  */
 BOMUtils.getQueryStringArgs = function(){
 	var qs = (location.search.length>0?location.search.substring(1):"");
