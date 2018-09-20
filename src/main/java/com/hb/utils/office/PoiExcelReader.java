@@ -1,4 +1,4 @@
-package com.hb.utils.office.poi;
+package com.hb.utils.office;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
