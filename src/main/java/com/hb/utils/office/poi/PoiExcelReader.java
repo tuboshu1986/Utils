@@ -15,6 +15,11 @@ import org.apache.poi.ss.usermodel.WorkbookFactory;
 
 import com.hb.utils.array.ArrayUtils;
 
+/**
+ * 读取excel，poi实线，来自网络
+ * 
+ * @date 2018年9月19日 下午6:13:38
+ */
 public class PoiExcelReader {
 	private Workbook workbook;
 	private DataFormatter formatter;
