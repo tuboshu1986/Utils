@@ -34,7 +34,7 @@ public class ThreadLoggerFactory {
         fileAppender.setThreshold(Level.DEBUG);
         fileAppender.setName(logName);
  
-        // 绑定到logger
+        // 绑定日志登记
         logger.setLevel(Level.DEBUG);
         logger.addAppender(fileAppender);
         
