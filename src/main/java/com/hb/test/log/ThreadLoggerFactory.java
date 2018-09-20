@@ -36,7 +36,7 @@ public class ThreadLoggerFactory {
  
         // 绑定日志登记
         // 123
-        //234
+        // 234
         logger.setLevel(Level.DEBUG);
         logger.addAppender(fileAppender);
         
