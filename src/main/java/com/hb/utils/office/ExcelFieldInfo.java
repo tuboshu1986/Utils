@@ -14,4 +14,11 @@ import java.lang.annotation.Target;
 public @interface ExcelFieldInfo
 {
     String name();
+    /**
+     * 对应的导入excel表头名称
+     * @date 2018年9月20日
+     */
+    String[] importName();
+    
+    String adapterClassName() default "";
 }

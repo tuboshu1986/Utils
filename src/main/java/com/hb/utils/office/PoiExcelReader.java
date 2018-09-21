@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.DataFormatter;
 import org.apache.poi.ss.usermodel.DateUtil;
@@ -12,8 +13,6 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
-
-import com.hb.utils.array.ArrayUtils;
 
 /**
  * 读取excel，poi实线，来自网络
@@ -23,6 +22,14 @@ import com.hb.utils.array.ArrayUtils;
 public class PoiExcelReader {
 	private Workbook workbook;
 	private DataFormatter formatter;
+
+	public static void main(String[] args) throws Exception {
+		String path = "C:/Users/dell/Desktop/查询登记表（样本）.xlsx";
+		PoiExcelReader reader = new PoiExcelReader(path);
+		for (DataObject obj : reader.toObjs(DataObject.class)) {
+			System.out.println(obj);
+		}
+	}
 
 	public PoiExcelReader(String path) throws Exception {
 		FileInputStream inputStream = new FileInputStream(path);
@@ -35,6 +42,29 @@ public class PoiExcelReader {
 		formatter = new DataFormatter();
 	}
 
+	public <T> List<T> toObjs(Class<T> clazz) {
+		List<T> rst = new ArrayList<T>();
+		List<Sheet> sheets = getSheetByClass(clazz);
+		for (Sheet s : sheets) {
+			String[] headers = this.getStringHeader(workbook.getSheetIndex(s));
+			List<String[]> data = this.getStringData(workbook.getSheetIndex(s),
+					1);
+
+			ExcelDataMapper<T> dataMapper = new ExcelDataMapper<T>(clazz,
+					headers, data, s.getSheetName());
+			dataMapper.convert();
+
+			rst.addAll(dataMapper.getRecords());
+		}
+
+		return rst;
+	}
+
+	/**
+	 * 获取指定sheet(0表示第一个sheet)中自limit(包含，0表示第一行)行开始的所有数据，如果没有符合条件的数据则返回null
+	 * 
+	 * @date 2018年9月20日
+	 */
 	public List<String[]> getStringData(int sheetIndex, int limit) {
 		Sheet sheet = workbook.getSheetAt(sheetIndex);
 		int lastRowNum = sheet.getLastRowNum();
@@ -46,6 +76,19 @@ public class PoiExcelReader {
 			sheetData.add(rowToStringArray(sheet.getRow(i)));
 		}
 		return sheetData;
+	}
+
+	private List<Sheet> getSheetByClass(Class<? extends Object> clazz) {
+		List<Sheet> rst = new ArrayList<Sheet>();
+		ExcelSheetInfo anno = clazz.getAnnotation(ExcelSheetInfo.class);
+		if (anno != null) {
+			for (String name : anno.sheetName()) {
+				Sheet sheet = workbook.getSheet(name);
+				if (sheet != null)
+					rst.add(sheet);
+			}
+		}
+		return rst;
 	}
 
 	public String[] getStringHeader(int sheetIndex) {
@@ -60,21 +103,37 @@ public class PoiExcelReader {
 		if (row == null)
 			return null;
 		List<String> data = new ArrayList<String>();
-		for (Cell cell : row) {
-			data.add(formatter.formatCellValue(cell));
+		int lastCellIdx = row.getLastCellNum();
+		for (int i = 0; i < lastCellIdx; i++) {
+			Cell cell = row.getCell(i);
+			data.add(cell == null ? null : formatter.formatCellValue(cell));
 		}
 		String[] strs = new String[data.size()];
-		return data.toArray(strs);
+		return trim(data.toArray(strs));
 	}
 
 	private Object[] rowToObjectArray(Row row) {
 		if (row == null)
 			return null;
 		List<Object> data = new ArrayList<Object>();
-		for (Cell cell : row) {
-			data.add(getCellValue(cell));
+		int lastCellIdx = row.getLastCellNum();
+		for (int i = 0; i < lastCellIdx; i++) {
+			Cell cell = row.getCell(i);
+			data.add(cell == null ? null : getCellValue(cell));
 		}
 		return data.toArray();
+	}
+
+	private String[] trim(String[] strs) {
+		if (strs == null || strs.length == 0)
+			return strs;
+		for (int i = 0; i < strs.length; i++) {
+			String str = strs[i];
+			if (!StringUtils.isEmpty(str)) {
+				strs[i] = str.trim();
+			}
+		}
+		return strs;
 	}
 
 	private Object getCellValue(Cell cell) {
@@ -103,16 +162,6 @@ public class PoiExcelReader {
 				break;
 		}
 		return val;
-	}
-
-	public static void main(String[] args) throws Exception {
-		String path = "C:/Users/dell/Desktop/话单/新建 Microsoft Excel 工作表1.xlsx";
-		PoiExcelReader reader = new PoiExcelReader(path);
-		System.out.println(ArrayUtils.toString(reader.getObjectHeader(0)));
-		List<String[]> data = reader.getStringData(0, 1);
-		for (String[] strings : data) {
-			System.out.println(ArrayUtils.toString(strings));
-		}
 	}
 
 	public Workbook getWorkbook() {

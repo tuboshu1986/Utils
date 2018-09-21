@@ -2,6 +2,7 @@ package com.hb.utils.base;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -147,6 +148,33 @@ public class BeanUtils {
 		} catch (Exception e) {
 		}
 		return null;
+	}
+
+	/**
+	 * 设置基本类型属性的值
+	 * 
+	 * @date 2018年9月21日
+	 */
+	public static void setValue(Object obj, Field f, String val) {
+		try {
+			Class<? extends Object> type = f.getType();
+			if (Integer.class.equals(type))
+				f.set(obj, Integer.parseInt(val));
+			else if (BigDecimal.class.equals(type))
+				f.set(obj, new BigDecimal(val));
+			else if (Float.class.equals(type))
+				f.set(obj, Float.parseFloat(val));
+			else if (Double.class.equals(type))
+				f.set(obj, Double.parseDouble(val));
+			else if (Long.class.equals(type))
+				f.set(obj, Long.parseLong(val));
+			else if (Short.class.equals(type))
+				f.set(obj, Short.parseShort(val));
+			else if (String.class.equals(type))
+				f.set(obj, val);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
