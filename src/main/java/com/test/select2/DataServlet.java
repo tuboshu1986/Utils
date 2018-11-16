@@ -107,7 +107,7 @@ public class DataServlet extends HttpServlet {
     	    in.close();
     	    
     	    String jsonStr = new String(bs);
-    	    JSONObject json = JSON.parseObject(jsonStr);
+    	    JSONObject json = JSONObject.fromObject(jsonStr);
     	    
     	    strs = new ArrayList<String>();
     	    Iterator<String> iterator = json.keySet().iterator();

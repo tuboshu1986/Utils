@@ -15,10 +15,7 @@ import java.util.Map.Entry;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.compress.archivers.dump.InvalidFormatException;
 import org.apache.poi.POIXMLDocument;
-import org.apache.poi.hwpf.HWPFDocument;
-import org.apache.poi.hwpf.usermodel.Range;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.xwpf.usermodel.XWPFParagraph;
 import org.apache.poi.xwpf.usermodel.XWPFRun;
@@ -44,7 +41,8 @@ public class WordUtil {
      * @return
      */
     public static String replaceAndGenerateWord(String filePath, Map<String, Object> param, String fileName, HttpServletRequest request, HttpServletResponse response){
-        String[] sp = filePath.split("\\.");
+        /*
+    	String[] sp = filePath.split("\\.");
         //判断文件是否有后缀名
         if(sp.length > 0){
             try{
@@ -105,6 +103,7 @@ public class WordUtil {
         }else{
             return "fail";
         }
+        */
         return "success";
     }
 
@@ -115,7 +114,7 @@ public class WordUtil {
      * @throws InvalidFormatException 
      * @throws org.apache.poi.openxml4j.exceptions.InvalidFormatException 
      */  
-    public static void processParagraphs(List<XWPFParagraph> paragraphList,Map<String, Object> param,CustomXWPFDocument doc) throws InvalidFormatException, FileNotFoundException, org.apache.poi.openxml4j.exceptions.InvalidFormatException{  
+    public static void processParagraphs(List<XWPFParagraph> paragraphList,Map<String, Object> param,CustomXWPFDocument doc) throws FileNotFoundException, org.apache.poi.openxml4j.exceptions.InvalidFormatException{  
         if(paragraphList != null && paragraphList.size() > 0){   
             //首选循环段落
             for(XWPFParagraph paragraph:paragraphList){ 
