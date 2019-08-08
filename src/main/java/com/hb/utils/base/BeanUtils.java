@@ -2,9 +2,9 @@ package com.hb.utils.base;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class BeanUtils {
 
@@ -287,6 +287,7 @@ public class BeanUtils {
         }
     }
 
+
     /**
      * 将from中非null的属性值复制到对象to的同名属性中
      *
@@ -295,8 +296,40 @@ public class BeanUtils {
      */
     public static void copyFieldIfNotNull(Object from, Object to) {
         getFields(from.getClass()).forEach(field -> {
-			Field toField = getField(to.getClass(), field.getName());
-			if(toField.getType().equals(field.getType())){
+            if(Modifier.isStatic(field.getModifiers()))
+                return;
+            Field toField = getField(to.getClass(), field.getName());
+            if(toField == null)
+                return;
+            if(toField.getType().equals(field.getType())){
+                Object val = fieldValue(from, field);
+                try {
+                    if(val != null)
+                        toField.set(to, val);
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    /**
+     * 将from中包含在fnames中的属性值复制到对象to的同名属性中，静态属性除外
+     *
+     * @param from
+     * @param to
+     * @param fnameSet
+     */
+    public static void copyFields(Object from, Object to, Set<String> fnameSet) {
+        getFields(from.getClass()).forEach(field -> {
+            if(!fnameSet.contains(field.getName()) || Modifier.isStatic(field.getModifiers()))
+                return;
+
+            Field toField = getField(to.getClass(), field.getName());
+            if(toField == null)
+                return;
+
+            if(toField.getType().equals(field.getType())){
                 Object val = fieldValue(from, field);
                 try {
                     toField.set(to, val);
@@ -307,5 +340,17 @@ public class BeanUtils {
         });
     }
 
+    /**
+     * 将from中包含在fnames中的属性值复制到对象to的同名属性中，静态属性除外
+     *
+     * @param from
+     * @param to
+     * @param fnames
+     */
+    public static void copyFields(Object from, Object to, String[] fnames) {
+        Set<String> modifyProperties = new HashSet<>();
+        modifyProperties.addAll(Arrays.asList(fnames));
+        copyFields(from, to, modifyProperties);
+    }
 
 }
