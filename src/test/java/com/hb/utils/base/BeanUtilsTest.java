@@ -5,6 +5,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.*;
 
+import java.io.Serializable;
+
 /**
  * BeanUtils Tester.
  *
@@ -127,9 +129,17 @@ public class BeanUtilsTest {
 
 }
 
-class BaseBean{
+class BaseBean implements Serializable {
     private String id;
     private String userName;
+
+    @Override
+    public String toString() {
+        return "BaseBean{" +
+                "id='" + id + '\'' +
+                ", userName='" + userName + '\'' +
+                '}';
+    }
 
     public String getUserName() {
         return userName;
